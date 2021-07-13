@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:quran/Widgets/JouzScreen/JouzGridView.dart';
 import 'package:quran/Widgets/SourScreen/SourWidget.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -7,21 +8,21 @@ class HomeScreen extends StatelessWidget {
     return DefaultTabController(
       length: 2,
       child: Scaffold(
-        appBar: AppBar(centerTitle: true,title: Text("Quran Kareem القرأن الكريم"),
+        appBar: AppBar(centerTitle: true,title: Text("القرأن الكريم"),
           bottom: TabBar(
-            automaticIndicatorColorAdjustment: true,
+            automaticIndicatorColorAdjustment: true,labelStyle: TextStyle(fontSize: 25,fontFamily: 'Reem'),
             tabs: [
               Tab(
-                text: "Jouz'",
+                text: "جزء",
               ),
-              Tab(
-                text: "Sura",
+              Tab( 
+                text: "سور",
               ),
             ],
           ),
         ),
         body: TabBarView(
-          children: [SourWidget(),SourWidget()],
+          children: [JouzGrid(),SourWidget()],
         ),
       ),
     );

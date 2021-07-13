@@ -1,5 +1,11 @@
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/services.dart';
 import 'package:quran/modal/AllSour.dart';
+import 'package:quran/modal/ayat.dart';
+import 'package:http/http.dart' as http;
+import 'package:quran/modal/tafseerModel.dart';
 
 class SourProvider with ChangeNotifier {
   List<AllSour> allSourList = [
@@ -802,4 +808,69 @@ class SourProvider with ChangeNotifier {
         numberOfAyahs: 6,
         revelationType: "Meccan"),
   ];
+
+  late String selectedSouraName;
+  List<Tafseer> tafseerList = [];
+  List<AyatModel> ayatList = [];
+  Future<void> getAyat(int souraNumber) async {
+    // final Uri url =
+    //     Uri.parse("https://api.alquran.cloud/v1/surah/$souraNumber");
+    try {
+      // final response = await http.get(url);
+      final response = await rootBundle.loadString('assets/data/quran.json');
+      final tafseerResponse =
+          await rootBundle.loadString('assets/data/tafseer.json');
+      final responseData = json.decode(response);
+      final responseDatatafseer = json.decode(tafseerResponse);
+      final dd = responseData["data"] as Map<String, dynamic>;
+      final ddTafseer = responseDatatafseer["data"] as Map<String, dynamic>;
+      final extractedData = dd["surahs"] as List<dynamic>;
+      final extractedDataTafseer = ddTafseer["surahs"] as List<dynamic>;
+      
+      extractedData.forEach((element) {
+        if (element["number"] != souraNumber) {
+        } else {
+          selectedSouraName = element["name"];
+          final List<AyatModel> data = [];
+          final ayatListData = element["ayahs"] as List<dynamic>;
+          ayatListData.forEach((aya) {
+            data.add(
+              AyatModel(
+                  hizbQuarter: aya["hizbQuarter"],
+                  juz: aya["juz"],
+                  manzil: aya["manzil"],
+                  number: aya["number"],
+                  numberInSurah: aya["numberInSurah"],
+                  page: aya["page"],
+                  ruku: aya["ruku"],
+                  sajda: aya["sajda"] == false ? false : true,
+                  text: aya["text"]),
+            );
+          });
+          
+          ayatList = data;
+        }
+      });
+
+      extractedDataTafseer.forEach((element) {
+        if (element["number"] != souraNumber) {
+        } else {
+          selectedSouraName = element["name"];
+          final List<Tafseer> dataTaf = [];
+          final ayatListDataTafseer = element["ayahs"] as List<dynamic>;
+          ayatListDataTafseer.forEach((aya) {
+            dataTaf.add(
+              Tafseer(ayasNumber: aya["number"], tafseer: aya["text"])
+            );
+          });
+          
+          tafseerList = dataTaf;
+        }
+      });
+
+      notifyListeners();
+    } catch (error) {
+      throw error;
+    }
+  }
 }
